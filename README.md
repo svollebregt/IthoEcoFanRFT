@@ -1,5 +1,5 @@
 # IthoEcoFanRFT
-Cloned from supersjimmie who cloned from Klusjesman, work in progress to modify for Raspberry Pi - DO NOT USE YET, UNFINSIHED
+Cloned from supersjimmie who cloned from Klusjesman, work in progress to modify for Raspberry Pi - DO NOT USE YET, UNFINISHED
 
 Will work with a 868MHz CC1101 module.
 The CC1150 may also work, except for receiving (which is not required for controlling an Itho EcoFan).
