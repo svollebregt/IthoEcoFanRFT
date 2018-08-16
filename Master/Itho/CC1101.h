@@ -183,7 +183,7 @@ class CC1101
 		//cc1101
 		void init();
 		
-		uint8_t writeCommand(uint8_t command);
+		void writeCommand(uint8_t command);
 		void writeRegister(uint8_t address, uint8_t data);
 		
 		uint8_t readRegister(uint8_t address, uint8_t registerType);
