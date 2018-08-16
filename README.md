@@ -1,9 +1,12 @@
 # IthoEcoFanRFT
-Cloned from supersjimmie who cloned from Klusjesman, work in progress to modify for Raspberry Pi - DO NOT USE YET
+Cloned from supersjimmie who cloned from Klusjesman, work in progress to modify for Raspberry Pi - DO NOT USE YET, UNFINSIHED
 
 Will work with a 868MHz CC1101 module.
 The CC1150 may also work, except for receiving (which is not required for controlling an Itho EcoFan).
 A 433MHz CC1101/CC1150 might also work, because it has the same chip. But a 433MHz CC11xx board has a different RF filter, causing a lot less transmission power (and reception).
+
+Requires wiringPi!
+
 ```
 Connections between the CC1101 and the ESP8266 or Arduino:
 CC11xx pins    ESP pins Arduino pins  RPi pins  Description
@@ -23,4 +26,6 @@ You should keep the wires to the CC11xx module as short as possible.
 
 Beware that the CC11xx modules are 3.3V (3.6V max) on all pins!
 This won't be a problem with a RPi as it has 3.3 V logic level, just make sure to connect Vdd top a 3.3 V pin and not 5 V!
+
+Inspiration for rewriting the code to allow it to work on a RPi is mostly from the C1101 library made by SpaCeTeddy (https://github.com/SpaceTeddy/CC1101)
 
