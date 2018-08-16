@@ -3,14 +3,28 @@
  */
 
 #include "CC1101.h"
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include <wiringPi.h>
+#include <wiringPiSPI.h>
 
 // default constructor
 CC1101::CC1101()
 {
-	SPI.begin();
-#ifdef ESP8266
-	pinMode(SS, OUTPUT);
-#endif
+	int x = 0;
+     	//printf ("init SPI bus... ");
+     	if ((x = wiringPiSPISetup (0, 8000000)) < 0)  //4MHz SPI speed
+     	{
+        	printf ("ERROR: wiringPiSPISetup failed!\r\n");
+     	}
+     	else{
+          	//printf ("wiringSPI is up\r\n");
+        }
+//	SPI.begin();
+//#ifdef ESP8266
+//	pinMode(SS, OUTPUT);
+//#endif
 } //CC1101
 
 // default destructor
@@ -48,43 +62,56 @@ void CC1101::reset()
 	delayMicroseconds(45);
 	select();
 
-	spi_waitMiso();
-	SPI.transfer(CC1101_SRES);
+	writeCommand(CC1101_SRES);
 	delay(10);
 	spi_waitMiso();
 	deselect();
 }
 
-uint8_t CC1101::writeCommand(uint8_t command) 
+void CC1101::writeCommand(uint8_t command) //not sure why this was unint8_t as the output seems to be never used?
 {
-	uint8_t result;
+	//uint8_t result;
 	
-	select();
-	spi_waitMiso();
-	result = SPI.transfer(command);
-	deselect();
+	uint8_t tbuf[1] = {0};
+	tbuf[0] = command;
+	wiringPiSPIDataRW (0, tbuf, 1) ;
 	
-	return result;
+	//select();
+	//spi_waitMiso();
+	//result = SPI.transfer(command);
+	//deselect();
+	
+	//return result;
 }
 
 void CC1101::writeRegister(uint8_t address, uint8_t data) 
 {
-	select();
-	spi_waitMiso();
-	SPI.transfer(address);
-	SPI.transfer(data);
-	deselect();
+	uint8_t tbuf[2] = {0};
+	tbuf[0] = address;
+	tbuf[1] = data;
+	uint8_t len = 2;
+	wiringPiSPIDataRW (0, tbuf, len) ;
+	
+	//select();
+	//spi_waitMiso();
+	//SPI.transfer(address);
+	//SPI.transfer(data);
+	//deselect();
 }
 
 uint8_t CC1101::readRegister(uint8_t address)
 {
 	uint8_t val;
-  
-	select();
-	spi_waitMiso();
-	SPI.transfer(address);
-	val = SPI.transfer(0);
-	deselect();
+	uint8_t rbuf[2] = {0};
+	rbuf[0] = spi_instr;
+	uint8_t len = 2;
+	wiringPiSPIDataRW (0, rbuf, len) ;
+	val = rbuf[1];
+	//select();
+	//spi_waitMiso();
+	//SPI.transfer(address);
+	//val = SPI.transfer(0);
+	//deselect();
   
 	return val;
 }
@@ -152,30 +179,47 @@ uint8_t CC1101::readRegister(uint8_t address, uint8_t registerType)
 
 void CC1101::writeBurstRegister(uint8_t address, uint8_t* data, uint8_t length)
 {
-	uint8_t i;
-
-	select();
-	spi_waitMiso();
-	SPI.transfer(address | CC1101_WRITE_BURST);
-	for (i = 0; i < length; i++) {
-		SPI.transfer(data[i]);
+	uint8_t tbuf[length + 1];
+	tbuf[0] = address | WRITE_BURST;
+	for (uint8_t i=0; i<length ;i++ )
+	{
+		tbuf[i+1] = data[i];
 	}
-	deselect();
+	wiringPiSPIDataRW (0, tbuf, length + 1) ;
+	
+	//uint8_t i;
+
+	//select();
+	//spi_waitMiso();
+	//SPI.transfer(address | CC1101_WRITE_BURST);
+	//for (i = 0; i < length; i++) {
+	//	SPI.transfer(data[i]);
+	//}
+	//deselect();
 }
 
 void CC1101::readBurstRegister(uint8_t* buffer, uint8_t address, uint8_t length)
 {
-	uint8_t i;
-	
-	select();
-	spi_waitMiso();
-	SPI.transfer(address | CC1101_READ_BURST);
-	
-	for (i = 0; i < length; i++) {
-		buffer[i] = SPI.transfer(0x00);
+	uint8_t rbuf[length + 1];
+	rbuf[0] = address | C1101_READ_BURST;
+	wiringPiSPIDataRW (0, rbuf, length + 1) ;
+	for (uint8_t i=0; i<length ;i++ )
+	{
+		buffer[i] = rbuf[i+1];
 	}
 	
-	deselect();
+	
+	//nt8_t i;
+	
+	//select();
+	//spi_waitMiso();
+	//SPI.transfer(address | CC1101_READ_BURST);
+	
+	//for (i = 0; i < length; i++) {
+	//	buffer[i] = SPI.transfer(0x00);
+	//}
+	
+	//deselect();
 }
 
 //wait for fixed length in rx fifo
