@@ -11,6 +11,11 @@
 //#include <SPI.h>
 // On Arduino, SPI pins are predefined
 
+//**************************** pins ******************************************//
+#define SS	 10
+#define GDO2      6
+#define GDO0     99
+
 /*	Type of transfers */
 #define CC1101_WRITE_BURST						0x40
 #define CC1101_READ_SINGLE						0x80
